@@ -1,0 +1,139 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>StackRelay</title>
+<link rel="stylesheet" href="styles.css">
+</head>
+<body>
+
+<header class="site-header">
+  <div class="header-row">
+    <div class="logo"></span>StackRelay<span class="slash"></div>
+    <nav class="site-nav">
+      <a href="index.html" class="active">Pipeline Flow</a>
+      <a href="loadbalancing.html">Load Balancing</a>
+    </nav>
+  </div>
+</header>
+
+<main>
+  <section class="hero wrap">
+    <h1>Every release is a packet<br>finding its <span class="accent">route.</span></h1>
+    <p class="lede">Watch a deployment travel the pipeline exactly like a packet crosses a network — hop by hop, gate by gate. Flip the failure switch to see the rollback path light up instead of production.</p>
+    <div class="controls">
+      <button class="btn btn-primary" id="run-btn">Run Deployment</button>
+      <button class="btn btn-ghost" id="reset-btn">Reset</button>
+      <label class="toggle-field">
+        <span class="switch">
+          <input type="checkbox" id="fail-toggle">
+          <span class="knob"></span>
+        </span>
+        Simulate security failure
+      </label>
+    </div>
+  </section>
+
+  <section class="diagram-section wrap">
+    <div class="diagram-frame">
+      <p class="frame-label">CI CD Flow<span>/ Pipeline‑01</span></p>
+      <div class="diagram-stage" id="stage" style="aspect-ratio:1680/680">
+        <svg viewBox="0 0 1680 680" preserveAspectRatio="none">
+          <path id="seg-0" class="trace" d="M80,280 C188.5,280 188.5,140 297,140"></path>
+          <path id="seg-1" class="trace" d="M297,140 C405.5,140 405.5,420 514,420"></path>
+          <path id="seg-2" class="trace" d="M514,420 C622.5,420 622.5,140 731,140"></path>
+          <path id="seg-3" class="trace" d="M731,140 C839.5,140 839.5,420 948,420"></path>
+          <path id="seg-4" class="trace" d="M948,420 C1056.5,420 1056.5,140 1165,140"></path>
+          <path id="seg-5" class="trace" d="M1165,140 C1273.5,140 1273.5,420 1382,420"></path>
+          <path id="seg-6" class="trace" d="M1382,420 C1491,420 1491,280 1600,280"></path>
+          <path id="rollback-path" class="trace-fail-path" d="M731,140 C731,300 731,440 731,600"></path>
+        </svg>
+        <div class="packet" id="packet"></div>
+
+        <div class="node" data-state="idle" id="node-0" style="--x:4.76%;--y:41.18%">
+          <div class="node-box"><span class="pin pin-t"></span><span class="pin pin-b"></span><span class="pin pin-l"></span><span class="pin pin-r"></span><span class="node-dot"></span></div>
+          <div><p class="node-title">COMMIT</p><p class="node-sub">git push origin main</p></div>
+        </div>
+        <div class="node" data-state="idle" id="node-1" style="--x:17.68%;--y:20.59%">
+          <div class="node-box"><span class="pin pin-t"></span><span class="pin pin-b"></span><span class="pin pin-l"></span><span class="pin pin-r"></span><span class="node-dot"></span></div>
+          <div><p class="node-title">BUILD</p><p class="node-sub">compiling artifacts</p></div>
+        </div>
+        <div class="node" data-state="idle" id="node-2" style="--x:30.60%;--y:61.76%">
+          <div class="node-box"><span class="pin pin-t"></span><span class="pin pin-b"></span><span class="pin pin-l"></span><span class="pin pin-r"></span><span class="node-dot"></span></div>
+          <div><p class="node-title">TEST</p><p class="node-sub">unit + lint suite</p></div>
+        </div>
+        <div class="node" data-state="idle" id="node-3" style="--x:43.51%;--y:20.59%">
+          <div class="node-box"><span class="pin pin-t"></span><span class="pin pin-b"></span><span class="pin pin-l"></span><span class="pin pin-r"></span><span class="node-dot"></span></div>
+          <div><p class="node-title">SCAN</p><p class="node-sub">deps &amp; secret scan</p></div>
+        </div>
+        <div class="node" data-state="idle" id="node-4" style="--x:56.43%;--y:61.76%">
+          <div class="node-box"><span class="pin pin-t"></span><span class="pin pin-b"></span><span class="pin pin-l"></span><span class="pin pin-r"></span><span class="node-dot"></span></div>
+          <div><p class="node-title">STAGE</p><p class="node-sub">staging environment</p></div>
+        </div>
+        <div class="node" data-state="idle" id="node-5" style="--x:69.35%;--y:20.59%">
+          <div class="node-box"><span class="pin pin-t"></span><span class="pin pin-b"></span><span class="pin pin-l"></span><span class="pin pin-r"></span><span class="node-dot"></span></div>
+          <div><p class="node-title">VERIFY</p><p class="node-sub">integration checks</p></div>
+        </div>
+        <div class="node" data-state="idle" id="node-6" style="--x:82.26%;--y:61.76%">
+          <div class="node-box"><span class="pin pin-t"></span><span class="pin pin-b"></span><span class="pin pin-l"></span><span class="pin pin-r"></span><span class="node-dot"></span></div>
+          <div><p class="node-title">APPROVE</p><p class="node-sub">manual release gate</p></div>
+        </div>
+        <div class="node" data-state="idle" id="node-7" style="--x:92.24%;--y:41.18%">
+          <div class="node-box"><span class="pin pin-t"></span><span class="pin pin-b"></span><span class="pin pin-l"></span><span class="pin pin-r"></span><span class="node-dot"></span></div>
+          <div><p class="node-title">PROD</p><p class="node-sub">production live</p></div>
+        </div>
+        <div class="node" data-state="idle" id="node-rollback" style="--x:43.51%;--y:80.24%">
+          <div class="node-box"><span class="pin pin-t"></span><span class="pin pin-b"></span><span class="pin pin-l"></span><span class="pin pin-r"></span><span class="node-dot"></span></div>
+          <div><p class="node-title">ROLLBACK</p><p class="node-sub">deployment halted</p></div>
+        </div>
+      </div>
+
+      <div class="side-panels">
+        <div class="terminal">
+          <div class="terminal-head"><span></span><span></span><span></span><p class="title">pipeline.log</p></div>
+          <div class="terminal-body" id="log-body">
+            <div class="line"><span class="t">00:00:00</span><span class="m">Awaiting trigger<span class="cursor"></span></span></div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+</main>
+
+<footer class="site-footer">
+  <div class="wrap footer-grid">
+    <div class="footer-brand">
+      <div class="logo"></span>StackRelay</div>
+      <p class="footer-tag">Two ways to watch traffic move — deployments hop by hop, requests server by server.</p>
+    </div>
+
+    <nav class="footer-links" aria-label="Site pages">
+      <p class="footer-heading">Pages</p>
+      <a href="index.html" class="footer-link active" aria-current="page">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><circle cx="6" cy="6" r="2.4"/><circle cx="6" cy="18" r="2.4"/><circle cx="18" cy="12" r="2.4"/><path d="M6 8.4V18M6 8.4C6 12 9.5 12 15.6 12"/></svg>
+        Pipeline Flow
+      </a>
+      <a href="loadbalancing.html" class="footer-link">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><circle cx="4.5" cy="12" r="2"/><circle cx="19.5" cy="5.5" r="2"/><circle cx="19.5" cy="12" r="2"/><circle cx="19.5" cy="18.5" r="2"/><path d="M6.3 12h11.2M6.3 12L17.7 5.5M6.3 12l11.4 6.5"/></svg>
+        Load Balancing
+      </a>
+    </nav>
+
+    <div class="footer-meta">
+      <p class="footer-heading">Status</p>
+      <a href="#top" class="footer-link footer-top">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M12 19V5M5 12l7-7 7 7"/></svg>
+        Back to top
+      </a>
+    </div>
+  </div>
+
+  <div class="wrap footer-bottom">
+    <span>StackRelay — A modern load balancing & CI/CD visualization</span>
+  </div>
+</footer>
+
+<script type="module" src="cicd.js"></script>
+</body>
+</html>
