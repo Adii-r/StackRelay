@@ -1,0 +1,140 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>StackRelay</title>
+<link rel="stylesheet" href="styles.css">
+</head>
+<body>
+
+<header class="site-header">
+  <div class="header-row">
+    <div class="logo"></span>StackRelay</div>
+    <nav class="site-nav">
+      <a href="index.html">Pipeline Flow</a>
+      <a href="loadbalancing.html" class="active">Load Balancing</a>
+    </nav>
+  </div>
+</header>
+
+<main>
+  <section class="hero wrap">
+    <h1>One address,<br>many <span class="accent">workers.</span></h1>
+    <p class="lede">Requests arrive as packets at a single balancer. Where each one lands depends on the strategy you pick below — and on which servers are still healthy. Click a server to take it offline and watch traffic reroute.</p>
+    <div class="controls">
+      <div class="segmented" id="algo-select">
+        <button class="active" data-algo="rr">Round Robin</button>
+        <button data-algo="lc">Least Connections</button>
+        <button data-algo="wt">Weighted</button>
+      </div>
+      <button class="btn btn-primary" id="stream-btn">Start Traffic</button>
+      <button class="btn btn-ghost" id="lb-reset-btn">Reset</button>
+    </div>
+  </section>
+
+  <section class="diagram-section wrap">
+    <div class="diagram-frame">
+      <p class="frame-label">Load Balancer<span>/ Flow‑01</span></p>
+      <div class="diagram-stage" id="lb-stage" style="aspect-ratio:1400/760">
+        <svg viewBox="0 0 1400 760" preserveAspectRatio="none">
+          <path id="seg-c0" class="trace" d="M100,130 C375,130 375,380 650,380"></path>
+          <path id="seg-c1" class="trace" d="M100,380 L650,380"></path>
+          <path id="seg-c2" class="trace" d="M100,630 C375,630 375,380 650,380"></path>
+          <path id="seg-s0" class="trace" d="M650,380 C950,380 950,100 1250,100"></path>
+          <path id="seg-s1" class="trace" d="M650,380 C950,380 950,290 1250,290"></path>
+          <path id="seg-s2" class="trace" d="M650,380 C950,380 950,480 1250,480"></path>
+          <path id="seg-s3" class="trace" d="M650,380 C950,380 950,670 1250,670"></path>
+        </svg>
+        <div class="packet" id="lb-packet"></div>
+        <div class="packet" id="lb-packet-2"></div>
+        <div class="packet" id="lb-packet-3"></div>
+
+        <div class="node client-node" id="client-0" style="--x:7.14%;--y:17.11%">
+          <div class="node-box"><span class="pin pin-r"></span><span class="node-dot"></span></div>
+          <div><p class="node-title">CLIENT A</p></div>
+        </div>
+        <div class="node client-node" id="client-1" style="--x:7.14%;--y:50%">
+          <div class="node-box"><span class="pin pin-r"></span><span class="node-dot"></span></div>
+          <div><p class="node-title">CLIENT B</p></div>
+        </div>
+        <div class="node client-node" id="client-2" style="--x:7.14%;--y:82.89%">
+          <div class="node-box"><span class="pin pin-r"></span><span class="node-dot"></span></div>
+          <div><p class="node-title">CLIENT C</p></div>
+        </div>
+
+        <div class="node" id="lb-node" style="--x:46.43%;--y:46%">
+          <div class="node-box"><span class="pin pin-t"></span><span class="pin pin-b"></span><span class="pin pin-l"></span><span class="pin pin-r"></span><span class="node-dot"></span></div>
+          <div><p class="node-title">BALANCER</p><p class="node-sub" id="algo-sub"></p></div>
+        </div>
+
+        <div class="node server-node" id="server-0" data-offline="false" style="--x:89.29%;--y:13.16%">
+          <div class="node-box"><span class="pin pin-l"></span><span class="node-dot"></span></div>
+          <div><p class="node-title">SERVER‑01</p><div class="load-track"><div class="load-fill"></div></div></div>
+          <span class="offline-hint">click to toggle</span>
+        </div>
+        <div class="node server-node" id="server-1" data-offline="false" style="--x:89.29%;--y:38.16%">
+          <div class="node-box"><span class="pin pin-l"></span><span class="node-dot"></span></div>
+          <div><p class="node-title">SERVER-02</p><div class="load-track"><div class="load-fill"></div></div></div>
+          <span class="offline-hint">click to toggle</span>
+        </div>
+        <div class="node server-node" id="server-2" data-offline="false" style="--x:89.29%;--y:63.16%">
+          <div class="node-box"><span class="pin pin-l"></span><span class="node-dot"></span></div>
+          <div><p class="node-title">SERVER‑03</p><div class="load-track"><div class="load-fill"></div></div></div>
+          <span class="offline-hint">click to toggle</span>
+        </div>
+        <div class="node server-node" id="server-3" data-offline="false" style="--x:89.29%;--y:86.16%">
+          <div class="node-box"><span class="pin pin-l"></span><span class="node-dot"></span></div>
+          <div><p class="node-title">SERVER‑04</p><div class="load-track"><div class="load-fill"></div></div></div>
+          <span class="offline-hint">click to toggle</span>
+        </div>
+      </div>
+
+      <div class="side-panels">
+        <div class="terminal">
+          <div class="terminal-head"><span></span><span></span><span></span><p class="title">balancer.log</p></div>
+          <div class="terminal-body" id="lb-log-body">
+            <div class="line"><span class="t">00:00:00</span><span class="m">Idle — no traffic<span class="cursor"></span></span></div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+</main>
+
+<footer class="site-footer">
+  <div class="wrap footer-grid">
+    <div class="footer-brand">
+      <div class="logo"></span>StackRelay</div>
+      <p class="footer-tag">Two ways to watch traffic move — deployments hop by hop, requests server by server.</p>
+    </div>
+
+    <nav class="footer-links" aria-label="Site pages">
+      <p class="footer-heading">Pages</p>
+      <a href="index.html" class="footer-link active" aria-current="page">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><circle cx="6" cy="6" r="2.4"/><circle cx="6" cy="18" r="2.4"/><circle cx="18" cy="12" r="2.4"/><path d="M6 8.4V18M6 8.4C6 12 9.5 12 15.6 12"/></svg>
+        Pipeline Flow
+      </a>
+      <a href="loadbalancing.html" class="footer-link">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><circle cx="4.5" cy="12" r="2"/><circle cx="19.5" cy="5.5" r="2"/><circle cx="19.5" cy="12" r="2"/><circle cx="19.5" cy="18.5" r="2"/><path d="M6.3 12h11.2M6.3 12L17.7 5.5M6.3 12l11.4 6.5"/></svg>
+        Load Balancing
+      </a>
+    </nav>
+
+    <div class="footer-meta">
+      <p class="footer-heading">Status</p>
+      <a href="#top" class="footer-link footer-top">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M12 19V5M5 12l7-7 7 7"/></svg>
+        Back to top
+      </a>
+    </div>
+  </div>
+
+  <div class="wrap footer-bottom">
+    <span>StackRelay — A modern load balancing & CI/CD visualization</span>
+  </div>
+</footer>
+
+<script type="module" src="loadbalancing.js"></script>
+</body>
+</html>
